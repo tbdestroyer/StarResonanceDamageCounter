@@ -362,7 +362,7 @@ class PacketProcessor {
                     }
                 }
                 if (isDead) {
-                    this.userDataManager.deleteEnemyData(targetUuid.toNumber())
+                    this.userDataManager.enemyCache.hp.set(targetUuid.toNumber(), 0);
                 }
             }
 
