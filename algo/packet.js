@@ -661,7 +661,17 @@ class PacketProcessor {
     _processSyncNearEntities(payloadBuffer) {
         const syncNearEntities = pb.SyncNearEntities.decode(payloadBuffer);
         // this.logger.debug(JSON.stringify(syncNearEntities, null, 2));
-
+        if (syncNearEntities.Disappear) {
+            for (const entity of syncNearEntities.Disappear) {
+                const entityUuid = entity.Uuid;
+                if (entityUuid && isUuidMonster(entityUuid)) {
+                    const entityUid = entityUuid.shiftRight(16).toNumber();
+                    if (entity.Type == pb.EDisappearType.EDisappearDead) {
+                        this.userDataManager.enemyCache.hp.set(entityUid, 0);
+                    }
+                }
+            }
+        }
         if (!syncNearEntities.Appear) return;
         for (const entity of syncNearEntities.Appear) {
             const entityUuid = entity.Uuid;
