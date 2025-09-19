@@ -1418,12 +1418,13 @@ async function main() {
         const srcport = tcpPacket.info.srcport;
         const dstport = tcpPacket.info.dstport;
         const src_server = srcaddr + ':' + srcport + ' -> ' + dstaddr + ':' + dstport;
+        const src_server_re = dstaddr + ':' + dstport + ' -> ' + srcaddr + ':' + srcport;
 
         await tcp_lock.acquire();
-        if (current_server !== src_server) {
+        if (current_server !== src_server && current_server !== src_server_re) {
             try {
                 //尝试通过小包识别服务器
-                if (buf[4] == 0) {
+                if (buf[4] == 0 && buf[5] == 6) {
                     const data = buf.subarray(10);
                     if (data.length) {
                         const stream = Readable.from(data, { objectMode: false });
@@ -1440,12 +1441,14 @@ async function main() {
                                     clearTcpCache();
                                     tcp_next_seq = tcpPacket.info.seqno + buf.length;
                                     clearDataOnServerChange();
-                                    logger.info('Got Scene Server Address: ' + src_server);
+                                    logger.info('Got Scene Server Address by FrameDown Notify Packet: ' + src_server);
                                 }
                             } catch (e) {}
                         } while (data1 && data1.length);
                     }
                 }
+            } catch (e) {}
+            try {
                 //尝试通过登录返回包识别服务器(仍需测试)
                 if (buf.length === 0x62) {
                     // prettier-ignore
@@ -1468,6 +1471,32 @@ async function main() {
                             clearDataOnServerChange();
                             logger.info('Got Scene Server Address by Login Return Packet: ' + src_server);
                         }
+                    }
+                }
+            } catch (e) {}
+            try {
+                //尝试通过一个上报的小包识别服务器
+                if (buf[4] == 0 && buf[5] == 5) {
+                    const data = buf.subarray(10);
+                    if (data.length) {
+                        const stream = Readable.from(data, { objectMode: false });
+                        let data1;
+                        do {
+                            const len_buf = stream.read(4);
+                            if (!len_buf) break;
+                            data1 = stream.read(len_buf.readUInt32BE() - 4);
+                            const signature = Buffer.from([0x00, 0x06, 0x26, 0xad, 0x66, 0x00]);
+                            if (Buffer.compare(data1.subarray(5, 5 + signature.length), signature)) break;
+                            try {
+                                if (current_server !== src_server_re) {
+                                    current_server = src_server_re;
+                                    clearTcpCache();
+                                    tcp_next_seq = tcpPacket.info.ackno;
+                                    clearDataOnServerChange();
+                                    logger.info('Got Scene Server Address by FrameUp Notify Packet: ' + src_server_re);
+                                }
+                            } catch (e) {}
+                        } while (data1 && data1.length);
                     }
                 }
             } catch (e) {}
