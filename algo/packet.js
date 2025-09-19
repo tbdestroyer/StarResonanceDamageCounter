@@ -286,6 +286,13 @@ class PacketProcessor {
             }
         }
 
+        const BuffEffectSync = aoiSyncDelta.BuffEffect;
+        if (isTargetMonster && BuffEffectSync && BuffEffectSync.BuffEffects) {
+            const BuffEffects = BuffEffectSync.BuffEffects;
+            for (const BuffEffect of BuffEffects) {
+            }
+        }
+
         const skillEffect = aoiSyncDelta.SkillEffects;
         if (!skillEffect) return;
 
