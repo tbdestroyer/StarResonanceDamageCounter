@@ -30,6 +30,8 @@
 
 前往 [Release 页面](https://github.com/dmlgzs/StarResonanceDamageCounter/releases) 下载发布版本。
 
+前往 [夸克网盘](https://pan.quark.cn/s/89c4795e0751) 下载发布版本。
+
 ### 手动编译
 
 #### 前置要求
@@ -203,6 +205,8 @@
   "msg": "Statistics have been cleared!"
 }
 ```
+
+## 其余 API 可在[源码](server.js)中查看
 
 ## 🔧 故障排除
 
