@@ -1364,7 +1364,8 @@ async function main() {
     const bufSize = 10 * 1024 * 1024;
     const buffer = Buffer.alloc(65535);
     const linkType = c.open(device, filter, bufSize, buffer);
-    if (linkType !== 'ETHERNET') {
+    const supportedLinkType = ['ETHERNET', 'NULL', 'LINKTYPE_LINUX_SLL'];
+    if (!supportedLinkType.includes(linkType)) {
         logger.error('The device seems to be WRONG! Please check the device! Device type: ' + linkType);
     }
     c.setMinBytes && c.setMinBytes(0);
@@ -1374,7 +1375,32 @@ async function main() {
     const processEthPacket = async (frameBuffer) => {
         // logger.debug('packet: length ' + nbytes + ' bytes, truncated? ' + (trunc ? 'yes' : 'no'));
 
-        var ethPacket = decoders.Ethernet(frameBuffer);
+        let ethPacket;
+        if (linkType === 'ETHERNET') {
+            ethPacket = decoders.Ethernet(frameBuffer);
+        } else if (linkType === 'NULL') {
+            ethPacket = {
+                info: {
+                    dstmac: '44:69:6d:6f:6c:65',
+                    srcmac: '44:69:6d:6f:6c:65',
+                    type: frameBuffer.readUInt32LE() === 2 ? 2048 : 75219598273637n,
+                    vlan: undefined,
+                    length: undefined,
+                },
+                offset: 4,
+            };
+        } else if (linkType === 'LINKTYPE_LINUX_SLL') {
+            ethPacket = {
+                info: {
+                    dstmac: '44:69:6d:6f:6c:65',
+                    srcmac: '44:69:6d:6f:6c:65',
+                    type: frameBuffer.readUInt32BE(14) === 0x0800 ? 2048 : 75219598273637n,
+                    vlan: undefined,
+                    length: undefined,
+                },
+                offset: 16,
+            };
+        }
 
         if (ethPacket.info.type !== PROTOCOL.ETHERNET.IPV4) return;
 
