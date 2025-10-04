@@ -411,7 +411,7 @@ tr:nth-child(even) {
     border-radius: 12px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
     width: 90%;
-    max-width: 65vw;
+    max-width: 75vw;
     max-height: 85vh;
     overflow: hidden;
     animation: slideIn 0.3s ease;
@@ -483,6 +483,51 @@ tr:nth-child(even) {
     color: #e2e8f0;
 }
 
+.skill-view-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.skill-view-toggle-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.skill-view-btn {
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: rgba(226, 232, 240, 0.08);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    color: #cbd5e0;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.skill-view-btn:hover {
+    border-color: #38bdf8;
+    color: #f1f5f9;
+}
+
+.skill-view-btn.active {
+    background: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
+.skill-view-status {
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 500;
+}
+
 .skill-stats-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
@@ -551,6 +596,12 @@ tr:nth-child(even) {
 
 .skill-table tr:hover td {
     background: rgba(52, 152, 219, 0.1);
+}
+
+.skill-empty-row td {
+    padding: 24px 12px;
+    color: #94a3b8;
+    font-style: italic;
 }
 
 .skill-crit {
