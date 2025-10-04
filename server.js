@@ -124,10 +124,11 @@ class Lock {
 
 // 通用统计类，用于处理伤害或治疗数据
 class StatisticData {
-    constructor(user, type, element) {
+    constructor(user, type, element, name) {
         this.user = user;
         this.type = type || '';
         this.element = element || '';
+        this.name = name || '';
         this.stats = {
             normal: 0,
             critical: 0,
@@ -281,11 +282,12 @@ class UserData {
     addDamage(skillId, element, damage, isCrit, isLucky, isCauseLucky, hpLessenValue = 0) {
         this.damageStats.addRecord(damage, isCrit, isLucky, hpLessenValue);
         // 记录技能使用情况
-        if (!this.skillUsage.has(skillId)) {
-            this.skillUsage.set(skillId, new StatisticData(this, '伤害', element));
+        const skillName = skillConfig[skillId] ?? skillId;
+        if (!this.skillUsage.has('伤害-' + skillName)) {
+            this.skillUsage.set('伤害-' + skillName, new StatisticData(this, '伤害', element, skillName));
         }
-        this.skillUsage.get(skillId).addRecord(damage, isCrit, isCauseLucky, hpLessenValue);
-        this.skillUsage.get(skillId).realtimeWindow.length = 0;
+        this.skillUsage.get('伤害-' + skillName).addRecord(damage, isCrit, isCauseLucky, hpLessenValue);
+        this.skillUsage.get('伤害-' + skillName).realtimeWindow.length = 0;
 
         const subProfession = getSubProfessionBySkillId(skillId);
         if (subProfession) {
@@ -304,14 +306,14 @@ class UserData {
     addHealing(skillId, element, healing, isCrit, isLucky, isCauseLucky) {
         this.healingStats.addRecord(healing, isCrit, isLucky);
         // 记录技能使用情况
-        skillId = skillId + 1000000000;
-        if (!this.skillUsage.has(skillId)) {
-            this.skillUsage.set(skillId, new StatisticData(this, '治疗', element));
+        const skillName = skillConfig[skillId] ?? skillId;
+        if (!this.skillUsage.has('治疗-' + skillName)) {
+            this.skillUsage.set('治疗-' + skillName, new StatisticData(this, '治疗', element, skillName));
         }
-        this.skillUsage.get(skillId).addRecord(healing, isCrit, isCauseLucky);
-        this.skillUsage.get(skillId).realtimeWindow.length = 0;
+        this.skillUsage.get('治疗-' + skillName).addRecord(healing, isCrit, isCauseLucky);
+        this.skillUsage.get('治疗-' + skillName).realtimeWindow.length = 0;
 
-        const subProfession = getSubProfessionBySkillId(skillId - 1000000000);
+        const subProfession = getSubProfessionBySkillId(skillId);
         if (subProfession) {
             this.setSubProfession(subProfession);
         }
@@ -377,16 +379,16 @@ class UserData {
     /** 获取技能统计数据 */
     getSkillSummary() {
         const skills = {};
-        for (const [skillId, stat] of this.skillUsage) {
+        for (const [skillKey, stat] of this.skillUsage) {
             const total = stat.stats.normal + stat.stats.critical + stat.stats.lucky + stat.stats.crit_lucky;
             const critCount = stat.count.critical;
             const luckyCount = stat.count.lucky;
             const critRate = stat.count.total > 0 ? critCount / stat.count.total : 0;
             const luckyRate = stat.count.total > 0 ? luckyCount / stat.count.total : 0;
-            const name = skillConfig[skillId % 1000000000] ?? skillId % 1000000000;
+            const name = stat.name ?? skillKey;
             const elementype = stat.element;
 
-            skills[skillId] = {
+            skills[skillKey] = {
                 displayName: name,
                 type: stat.type,
                 elementype: elementype,
