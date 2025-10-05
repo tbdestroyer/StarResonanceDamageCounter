@@ -1,4 +1,5 @@
-const cap = require('cap');
+const fs = require('fs');
+const cap = safeRequireCap();
 const cors = require('cors');
 const readline = require('readline');
 const winston = require('winston');
@@ -36,6 +37,19 @@ const devices = cap.deviceList();
 
 // 暂停统计状态
 let isPaused = false;
+
+function safeRequireCap() {
+    try {
+        return require('cap');
+    } catch (e) {
+        console.error(e);
+        console.log(
+            '\x1b[31mFailed to load the PCAP module. Please verify that the required Node.js dependencies are installed and ensure that Npcap/WinPcap is properly installed.\x1b[0m',
+        );
+        fs.readSync(0, Buffer.alloc(1), 0, 1, null);
+        process.exit(0);
+    }
+}
 
 function ask(question) {
     return new Promise((resolve) => {
