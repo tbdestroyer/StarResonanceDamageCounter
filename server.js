@@ -38,16 +38,20 @@ const devices = cap.deviceList();
 // 暂停统计状态
 let isPaused = false;
 
+function warnAndExit(text) {
+    console.log(`\x1b[31m${text}\x1b[0m`);
+    fs.readSync(0, Buffer.alloc(1), 0, 1, null);
+    process.exit(1);
+}
+
 function safeRequireCap() {
     try {
         return require('cap');
     } catch (e) {
         console.error(e);
-        console.log(
-            '\x1b[31mFailed to load the PCAP module. Please verify that the required Node.js dependencies are installed and ensure that Npcap/WinPcap is properly installed.\x1b[0m',
+        warnAndExit(
+            'Failed to load the PCAP module. Please verify that the required Node.js dependencies are installed and ensure that Npcap/WinPcap is properly installed.',
         );
-        fs.readSync(0, Buffer.alloc(1), 0, 1, null);
-        process.exit(0);
     }
 }
 
@@ -1594,8 +1598,7 @@ async function main() {
 if (!zlib.zstdDecompressSync) {
     // 之前总是有人用旧版本nodejs，不看警告还说数据不准，现在干脆不让旧版用算了
     // 还有人对着开源代码写闭源，不遵守许可就算了，还要诋毁开源，什么人啊这是
-    print('zstdDecompressSync is not available! Please update your Node.js!');
-    process.exit(1);
+    warnAndExit('zstdDecompressSync is not available! Please update your Node.js!');
 }
 
 main();
