@@ -189,6 +189,13 @@
       "taken_damage": 65,
       "profession": "愈合"
     }
+  },
+  "enemy": {
+    "15395": {
+      "name": "雷电食人魔",
+      "hp": 18011262,
+      "max_hp": 18011262
+    }
   }
 }
 ```
@@ -203,6 +210,25 @@
 {
   "code": 0,
   "msg": "Statistics have been cleared!"
+}
+```
+
+### GET /api/enemies
+
+获取敌方数据
+
+**响应示例：**
+
+```json
+{
+  "code": 0,
+  "enemy": {
+    "15395": {
+      "name": "雷电食人魔",
+      "hp": 18011262,
+      "max_hp": 18011262
+    }
+  }
 }
 ```
 
