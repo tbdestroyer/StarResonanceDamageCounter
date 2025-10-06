@@ -855,10 +855,9 @@ class UserDataManager {
                 maxHpMonster: '',
             };
 
-            let maxHpMonsterId = -1;
+            let maxHpMonsterId = 0;
             for (const [id, hp] of this.enemyCache.maxHp.entries()) {
-                if (!summary.maxHpMonster || hp > this.enemyCache.maxHp.get(summary.maxHpMonster)) {
-                    summary.maxHpMonster = String(id);
+                if (!maxHpMonsterId || hp > this.enemyCache.maxHp.get(maxHpMonsterId)) {
                     maxHpMonsterId = id;
                 }
             }
