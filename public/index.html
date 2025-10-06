@@ -289,6 +289,16 @@
             </div>
         </div>
 
+        <div class="card" id="enemyCard">
+            <h3 style="margin-top: 0; display: flex; align-items: center; gap: 8px">
+                🛡️ 怪物血条
+                <span id="enemySummary" class="enemy-summary"></span>
+            </h3>
+            <div id="enemyList" class="enemy-list">
+                <div class="enemy-empty">暂未发现敌方目标</div>
+            </div>
+        </div>
+
         <footer style="margin-top: 40px; font-size: 14px; color: #888">
             <span>© 2025 Made with ❤️ by </span>
             <a href="https://github.com/dmlgzs/" target="_blank">Dimole</a>
@@ -313,6 +323,7 @@
             let userColorMap = {}; // 用户固定颜色映射
             let isUpdatingFromLegend = false; // 防止图例事件和控制面板事件相互触发
             let currentUserArray = []; // 缓存当前用户数组用于查找用户名
+            let lastEnemySignature = '';
 
             // y轴动态调整相关变量
             const Y_AXIS_FLOOR_MIN = 10000;
@@ -1253,6 +1264,94 @@
                 }
             }
 
+            function formatNumber(value) {
+                const num = Number(value);
+                if (!Number.isFinite(num)) return '0';
+                return num.toLocaleString();
+            }
+
+            function escapeHtml(text) {
+                if (text === undefined || text === null) return '';
+                return text
+                    .toString()
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+
+            function updateEnemyDisplay(enemyData) {
+                const enemyCard = document.getElementById('enemyCard');
+                const enemyList = document.getElementById('enemyList');
+                const enemySummary = document.getElementById('enemySummary');
+                if (!enemyCard || !enemyList) return;
+
+                const entries = Object.entries(enemyData || {});
+                const parsed = entries.map(([id, info]) => {
+                    const name = info && typeof info.name === 'string' && info.name.trim().length > 0 ? info.name.trim() : `未知敌人 #${id}`;
+                    const hp = Number(info?.hp ?? 0);
+                    const maxHp = Number(info?.max_hp ?? 0);
+                    return {
+                        id,
+                        name,
+                        hp: Number.isFinite(hp) ? hp : 0,
+                        maxHp: Number.isFinite(maxHp) ? maxHp : 0,
+                    };
+                });
+
+                const validEnemies = parsed.filter((enemy) => (enemy.name || enemy.hp || enemy.maxHp) && !String(enemy.name).endsWith('-共鸣'));
+
+                if (validEnemies.length === 0) {
+                    if (enemySummary) enemySummary.textContent = '共 0 个目标，存活 0 个';
+                    enemyList.innerHTML = '<div class="enemy-empty">暂未发现敌方目标</div>';
+                    lastEnemySignature = '__empty__';
+                    return;
+                }
+
+                const sortedEnemies = validEnemies.sort((a, b) => {
+                    if (b.maxHp !== a.maxHp) return b.maxHp - a.maxHp;
+                    return Number(a.id) - Number(b.id);
+                });
+
+                const signature = JSON.stringify(sortedEnemies.map((enemy) => [enemy.id, enemy.hp, enemy.maxHp, enemy.name]));
+                if (signature === lastEnemySignature) return;
+                lastEnemySignature = signature;
+
+                enemyList.innerHTML = '';
+
+                sortedEnemies.forEach((enemy) => {
+                    const percentRaw = enemy.maxHp > 0 ? (enemy.hp / enemy.maxHp) * 100 : 0;
+                    const percent = Math.max(0, Math.min(100, percentRaw));
+                    const progress = enemy.maxHp > 0 ? percent / 100 : 0;
+                    const fillColor =
+                        enemy.maxHp > 0 ? (enemy.hp <= 0 ? 'rgba(127, 140, 141, 0.35)' : 'rgba(231, 76, 60, 0.32)') : 'rgba(231, 76, 60, 0.18)';
+                    const currentHp = Math.max(0, enemy.hp);
+                    const hpDisplay = `${formatNumber(currentHp)} / ${enemy.maxHp > 0 ? formatNumber(enemy.maxHp) : '未知'}`;
+                    const statusText = enemy.maxHp > 0 ? (enemy.hp <= 0 ? '已击败' : `${percent.toFixed(1)}%`) : '血量未知';
+                    const statusClass = enemy.maxHp > 0 && enemy.hp <= 0 ? 'enemy-status defeated' : 'enemy-status';
+
+                    const item = document.createElement('div');
+                    item.className = 'enemy-item';
+                    item.style.setProperty('--hp-progress', progress.toFixed(4));
+                    item.style.setProperty('--hp-fill-color', fillColor);
+                    item.innerHTML = `
+                        <div class="enemy-item-content">
+                            <div class="enemy-item-header">
+                                <div class="enemy-name" title="${escapeHtml(enemy.name)} #${escapeHtml(enemy.id)}">${escapeHtml(enemy.name)} <span class="enemy-id">#${escapeHtml(enemy.id)}</span></div>
+                                <div class="enemy-hp-value">${hpDisplay} <span class="${statusClass}">(${statusText})</span></div>
+                            </div>
+                        </div>
+                    `;
+                    enemyList.appendChild(item);
+                });
+
+                if (enemySummary) {
+                    const aliveCount = sortedEnemies.filter((enemy) => enemy.hp > 0).length;
+                    enemySummary.textContent = `共 ${sortedEnemies.length} 个目标，存活 ${aliveCount} 个`;
+                }
+            }
+
             // 处理数据更新（WebSocket和API通用）
             function processDataUpdate(data, updateHistory = true) {
                 try {
@@ -1286,6 +1385,7 @@
 
                     lastVisiableUserArray = visibleUserArray;
                     updateTables(visibleUserArray);
+                    updateEnemyDisplay(data.enemy || {});
 
                     // 检查是否需要启用性能模式
                     const activeUserCount = Object.keys(dpsHistory).length;
@@ -1522,6 +1622,7 @@
                 currentUserArray = []; // 清空当前用户数组缓存
                 lastUpdateTime = 0; // 重置图表更新时间
                 performanceMode = false;
+                updateEnemyDisplay({});
 
                 // 清空ECharts图表 - 完全重新初始化
                 if (chart) {

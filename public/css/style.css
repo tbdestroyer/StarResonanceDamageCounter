@@ -46,7 +46,7 @@ a {
 
 .card {
     max-width: 85vw;
-    margin: 0 auto;
+    margin: 20px auto;
     background: white;
     border-radius: 16px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
@@ -228,6 +228,157 @@ tr:nth-child(even) {
     background: #2d2d2d !important;
     color: #e0e0e0 !important;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+}
+
+.enemy-summary {
+    font-size: 14px;
+    color: #7f8c8d;
+    font-weight: normal;
+}
+
+.enemy-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 6px;
+    text-align: left;
+}
+
+.enemy-item {
+    position: relative;
+    border: 1px solid #e0e6ed;
+    border-radius: 10px;
+    padding: 5px 8px;
+    background: #f8faff;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    overflow: hidden;
+    --hp-progress: 0;
+    --hp-fill-color: rgba(231, 76, 60, 0.32);
+}
+
+.enemy-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.enemy-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: calc(var(--hp-progress) * 100%);
+    background: var(--hp-fill-color);
+    transition:
+        width 0.3s ease,
+        background-color 0.3s ease;
+    z-index: 0;
+}
+
+.enemy-item-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.enemy-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+    gap: 10px;
+}
+
+.enemy-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2c3e50;
+    flex: 1 1 auto;
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.enemy-id {
+    font-size: 12px;
+    color: #7f8c8d;
+    flex: 0 0 auto;
+}
+
+.enemy-hp-value {
+    font-size: 12px;
+    color: #5d6d7e;
+    white-space: nowrap;
+    margin-left: auto;
+}
+
+.enemy-meta {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #95a5a6;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.enemy-status {
+    font-weight: 600;
+}
+
+.enemy-status.defeated {
+    color: #e74c3c;
+}
+
+.enemy-empty {
+    text-align: center;
+    color: #95a5a6;
+    font-size: 14px;
+    padding: 20px 0;
+    border: 1px dashed #d5dadf;
+    border-radius: 12px;
+    background: #fbfcff;
+}
+
+.dark-mode .enemy-summary {
+    color: #b0bec5;
+}
+
+.dark-mode .enemy-item {
+    border-color: #3c4a57;
+    background: #2f3a45;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.dark-mode .enemy-item::before {
+    background: var(--hp-fill-color, rgba(231, 76, 60, 0.45));
+}
+
+.dark-mode .enemy-item:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.dark-mode .enemy-name {
+    color: #ecf0f1;
+}
+
+.dark-mode .enemy-hp-value {
+    color: #cfd8dc;
+}
+
+.dark-mode .enemy-meta {
+    color: #90a4ae;
+}
+
+.dark-mode .enemy-empty {
+    color: #90a4ae;
+    border-color: #455a64;
+    background: #2f3a45;
 }
 
 .user-controls {
