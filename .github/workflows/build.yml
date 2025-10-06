@@ -74,21 +74,33 @@ jobs:
         xcopy LICENSE dist\
         xcopy README.md dist\
 
+    # 创建 ZIP 包
+    - name: Create ZIP package
+      run: |
+        $zipName = "dist/StarResonanceDamageCounter.zip"
+        if (Test-Path $zipName) {
+          Remove-Item $zipName
+        }
+        Compress-Archive -Path dist\* -DestinationPath $zipName
+        if (Test-Path $zipName) {
+          Write-Host "ZIP package created successfully at $zipName"
+        } else {
+          Write-Error "ZIP file not found!"
+          exit 1
+        }
+
     # 上传构建产物
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: StarResonanceDamageCounter
-        path: dist
+        path: dist/StarResonanceDamageCounter.zip
 
     - name: Release
       uses: softprops/action-gh-release@v2
       if: github.ref_type == 'tag'
       with:
         files: |
-          dist/star-resonance-damage-counter.exe
-          dist/commit.txt
-          LICENSE
-          README.md
+          dist/StarResonanceDamageCounter.zip
       env:
         GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
