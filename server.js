@@ -852,7 +852,19 @@ class UserDataManager {
                 duration: endTime - timestamp,
                 userCount: users.size,
                 version: VERSION,
+                maxHpMonster: '',
             };
+
+            let maxHpMonsterId = -1;
+            for (const [id, hp] of this.enemyCache.maxHp.entries()) {
+                if (!summary.maxHpMonster || hp > this.enemyCache.maxHp.get(summary.maxHpMonster)) {
+                    summary.maxHpMonster = String(id);
+                    maxHpMonsterId = id;
+                }
+            }
+            if (maxHpMonsterId && this.enemyCache.name.has(maxHpMonsterId)) {
+                summary.maxHpMonster = this.enemyCache.name.get(maxHpMonsterId);
+            }
 
             const allUsersData = {};
             const userDatas = new Map();
@@ -1015,9 +1027,11 @@ async function main() {
 
     app.get('/api/data', (req, res) => {
         const userData = userDataManager.getAllUsersData();
+        const enemiesData = userDataManager.getAllEnemiesData();
         const data = {
             code: 0,
             user: userData,
+            enemy: enemiesData,
         };
         res.json(data);
     });
@@ -1241,9 +1255,11 @@ async function main() {
     setInterval(() => {
         if (!isPaused) {
             const userData = userDataManager.getAllUsersData();
+            const enemiesData = userDataManager.getAllEnemiesData();
             const data = {
                 code: 0,
                 user: userData,
+                enemy: enemiesData,
             };
             io.emit('data', data);
         }
