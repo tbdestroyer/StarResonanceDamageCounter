@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>血条监控 - 星痕共鸣</title>
         <script src="./socket.io.min.js"></script>
+        <script src="i18n.js"></script>
         <style>
             * {
                 margin: 0;
@@ -492,27 +493,27 @@
         <div class="container">
             <div class="header">
                 <div class="header-left">
-                    <div class="title">🩸 血条监控</div>
-                    <div class="subtitle" id="playerCount">等待数据连接...</div>
+                    <div class="title" data-i18n="hpMonitorTitle">🩸 血条监控</div>
+                    <div class="subtitle" id="playerCount" data-i18n="waitingForConnection">等待数据连接...</div>
                 </div>
 
                 <div class="header-center">
                     <div class="controls">
-                        <button class="btn active" id="sortHpBtn" onclick="setSortMode('hp')">💚 按血量</button>
-                        <button class="btn" id="sortNameBtn" onclick="setSortMode('name')">🏷️ 按姓名</button>
-                        <button class="btn" id="sortDpsBtn" onclick="setSortMode('dps')">⚔️ 按DPS</button>
-                        <button class="btn" id="sortHpsBtn" onclick="setSortMode('hps')">🩹 按HPS</button>
+                        <button class="btn active" id="sortHpBtn" onclick="setSortMode('hp')" data-i18n="sortByHp">💚 按血量</button>
+                        <button class="btn" id="sortNameBtn" onclick="setSortMode('name')" data-i18n="sortByName">🏷️ 按姓名</button>
+                        <button class="btn" id="sortDpsBtn" onclick="setSortMode('dps')" data-i18n="sortByDpsHp">⚔️ 按DPS</button>
+                        <button class="btn" id="sortHpsBtn" onclick="setSortMode('hps')" data-i18n="sortByHpsHp">🩹 按HPS</button>
                     </div>
                 </div>
 
                 <div class="header-right">
-                    <div class="connection-status status-connecting" id="connectionStatus">🔄 连接中</div>
+                    <div class="connection-status status-connecting" id="connectionStatus" data-i18n="connecting">🔄 连接中</div>
                 </div>
             </div>
 
             <div class="hp-grid" id="playerGrid">
                 <div class="no-data">
-                    <div>🔄 正在连接服务器...</div>
+                    <div data-i18n="connectingServer">🔄 正在连接服务器...</div>
                 </div>
             </div>
         </div>
@@ -635,16 +636,16 @@
 
                 switch (status) {
                     case 'connected':
-                        statusElement.textContent = '🟢 WebSocket';
+                        statusElement.textContent = translations.websocketConnected || '🟢 WebSocket';
                         break;
                     case 'api':
-                        statusElement.textContent = '🟡 轮询模式';
+                        statusElement.textContent = translations.pollingMode || '🟡 轮询模式';
                         break;
                     case 'disconnected':
-                        statusElement.textContent = '🔴 连接断开';
+                        statusElement.textContent = translations.connectionLost || '🔴 连接断开';
                         break;
                     default:
-                        statusElement.textContent = '🔄 连接中';
+                        statusElement.textContent = translations.connecting || '🔄 连接中';
                 }
             }
 
@@ -713,7 +714,8 @@
             function updatePlayerCount() {
                 const playerCountElement = document.getElementById('playerCount');
                 const count = currentPlayers.length;
-                playerCountElement.textContent = `监控中: ${count}/20 名玩家`;
+                const template = translations.monitoringPlayers || '监控中: {count}/20 名玩家';
+                playerCountElement.textContent = template.replace('{count}', count);
             }
 
             // 渲染玩家卡片
@@ -800,7 +802,7 @@
                 // 添加无数据提示元素
                 const noDataElement = document.createElement('div');
                 noDataElement.className = 'no-data';
-                noDataElement.innerHTML = '<div>📭 暂无参战玩家血条数据<br>🗺️ 切线或切图可重新获取血条数据</div>';
+                noDataElement.innerHTML = `<div>📭 暂无参战玩家血条数据<br>🗺️ 切线或切图可重新获取血条数据</div>`;
                 noDataElement.style.display = 'block';
                 grid.appendChild(noDataElement);
             }
