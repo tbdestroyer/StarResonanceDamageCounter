@@ -276,7 +276,7 @@
 
                 const hasValidName = user.name && user.name.trim() !== '';
                 const nickname = userNicknames[userId] || (hasValidName ? user.name : '') || '';
-                const copyText = `${nickname}#${userId} 伤害:${user.total_damage.total} 治疗:${user.total_healing.total} DPS:${user.total_dps.toFixed(2)} HPS:${user.total_hps.toFixed(2)}`;
+                const copyText = `${nickname}#${userId} ${getTranslationByReplace('伤害')}:${user.total_damage.total} ${getTranslationByReplace('治疗')}:${user.total_healing.total} DPS:${user.total_dps.toFixed(2)} HPS:${user.total_hps.toFixed(2)}`;
 
                 // 复制昵称到剪贴板
                 navigator.clipboard
