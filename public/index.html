@@ -757,7 +757,7 @@
                     `${skillData.name || `UID:${skillData.uid}`} - ${translations.skillAnalysis || '技能分析'}`;
                 document.getElementById('skillUserNickname').textContent = skillData.name;
                 document.getElementById('skillUserProfession').textContent = userInfo
-                    ? userInfo.profession || translations.unknown || '未知'
+                    ? getTranslatedProfession(userInfo.profession) || translations.unknown || '未知'
                     : translations.unknown || '未知';
                 document.getElementById('fightPoint').textContent = userInfo
                     ? userInfo.fightPoint || translations.unknown || '未知'
@@ -1584,11 +1584,11 @@
 
                     // 其他数据列
                     const otherCells = [
-                        user.profession || '未知',
+                        getTranslatedProfession(user.profession || translations.unknown || '未知'),
                         Number(user.fightPoint).toLocaleString(),
-                        (user.hp ?? '未知').toLocaleString(),
+                        (user.hp ?? (translations.unknown || '未知')).toLocaleString(),
                         Number(user.taken_damage).toLocaleString(),
-                        user.dead_count ?? '未知',
+                        user.dead_count ?? (translations.unknown || '未知'),
                         `${(crit_rate * 100).toFixed(2)}%`,
                         `${(lucky_rate * 100).toFixed(2)}%`,
                     ];

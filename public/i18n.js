@@ -30,6 +30,7 @@ function getSystemLanguage() {
 let currentLang = localStorage.getItem('lang') || getSystemLanguage();
 let translations = {};
 let translation_replacement = {};
+let translation_professions = {};
 
 // 支持的语言列表
 const supportedLanguages = [
@@ -43,6 +44,7 @@ async function loadTranslations(lang) {
         const data = await response.json();
         translations = data.translations || {};
         translation_replacement = data.replacement || {};
+        translation_professions = data.professions || {};
     } catch (error) {
         console.error('Failed to load translations:', error);
     }
@@ -223,4 +225,12 @@ function updateActionButtons() {
 
 function getTranslationByReplace(chi) {
     return translation_replacement[chi] || chi;
+}
+
+function getTranslatedProfession(profession) {
+    const professions = profession.split('-');
+    for (let i = 0; i < professions.length; i++) {
+        professions[i] = translation_professions[professions[i]] || professions[i];
+    }
+    return professions.join('-');
 }
