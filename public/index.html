@@ -788,7 +788,10 @@
                         emptyRow.className = 'skill-empty-row';
                         const emptyCell = document.createElement('td');
                         emptyCell.colSpan = 10;
-                        emptyCell.textContent = (translations.noSkillData || '暂无{type}技能数据').replace('{type}', typeLabel);
+                        emptyCell.textContent = (translations.noSkillData || '暂无{type}技能数据').replace(
+                            '{type}',
+                            getTranslationByReplace(typeLabel),
+                        );
                         emptyRow.appendChild(emptyCell);
                         tableBody.appendChild(emptyRow);
                     }
@@ -820,7 +823,7 @@
                     emptyRow.className = 'skill-empty-row';
                     const emptyCell = document.createElement('td');
                     emptyCell.colSpan = 10;
-                    emptyCell.textContent = (translations.noSkillData || '暂无{type}技能数据').replace('{type}', typeLabel);
+                    emptyCell.textContent = (translations.noSkillData || '暂无{type}技能数据').replace('{type}', getTranslationByReplace(typeLabel));
                     emptyRow.appendChild(emptyCell);
                     tableBody.appendChild(emptyRow);
                     renderSkillCharts([], [], [], [], typeLabel);
@@ -840,7 +843,7 @@
 
                 // 渲染表格 + 收集图表数据
                 sortedSkills.forEach(({ skillId, skill }) => {
-                    const name = skill.displayName || skillId;
+                    const name = getTranslationByReplace(skill.displayName || skillId);
                     const damageBreakdown = skill.damageBreakdown || {};
                     const critDamage = Number(damageBreakdown.critical || 0) + Number(damageBreakdown.crit_lucky || 0);
                     const normalDamage = Number(damageBreakdown.normal || 0) + Number(damageBreakdown.lucky || 0);
@@ -850,7 +853,7 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${name}</td>
-                        <td>${skill.elementype || '-'}</td>
+                        <td>${getTranslationByReplace(skill.elementype) || '-'}</td>
                         <td>${percentage.toFixed(2)}%</td>
                         <td>${Number(skill.totalDamage ?? 0).toLocaleString()}</td>
                         <td>${skill.totalCount ?? 0}</td>
@@ -904,6 +907,7 @@
 
             // 渲染技能图表
             function renderSkillCharts(skillNames, damages, critRates, luckyRates, typeLabel) {
+                typeLabel = getTranslationByReplace(typeLabel);
                 const damageChartEl = document.getElementById('skillDamageChart');
                 const critChartEl = document.getElementById('skillCritChart');
 
@@ -923,8 +927,15 @@
                 skillChart1 = echarts.init(damageChartEl);
                 skillChart2 = echarts.init(critChartEl);
 
+                const skillValueDistribution = (translations.skillValueDistribution || '{typeLabel}技能数值分布').replace('{typeLabel}', typeLabel);
+                const skillValue = (translations.skillValue || '{typeLabel}技能数值').replace('{typeLabel}', typeLabel);
+                const skillCritAndLuckyRate = (translations.skillCritAndLuckyRate || '{typeLabel}技能暴击率与幸运触发率').replace(
+                    '{typeLabel}',
+                    typeLabel,
+                );
+
                 if (!Array.isArray(skillNames) || skillNames.length === 0) {
-                    const emptyText = (translations.noSkillData || '暂无{type}技能数据').replace('{type}', typeLabel);
+                    const emptyText = (translations.noSkillData || '暂无{type}技能数据').replace('{type}', getTranslationByReplace(typeLabel));
                     const emptyGraphic = {
                         type: 'text',
                         left: 'center',
@@ -938,14 +949,14 @@
 
                     skillChart1.setOption({
                         title: {
-                            text: `${typeLabel}技能数值分布`,
+                            text: skillValueDistribution,
                             left: 'center',
                             textStyle: { color: '#e2e8f0' },
                         },
                         graphic: emptyGraphic,
                         series: [
                             {
-                                name: `${typeLabel}技能数值`,
+                                name: skillValue,
                                 type: 'pie',
                                 data: [],
                             },
@@ -954,7 +965,7 @@
 
                     skillChart2.setOption({
                         title: {
-                            text: `${typeLabel}技能暴击率与幸运触发率`,
+                            text: skillCritAndLuckyRate,
                             left: 'center',
                             textStyle: { color: '#e2e8f0' },
                         },
@@ -990,7 +1001,7 @@
                 if (otherDamages > 0) {
                     pieData.push({
                         value: otherDamages,
-                        name: '其他',
+                        name: getTranslationByReplace('其他'),
                         label: {
                             show: true,
                             position: 'outside',
@@ -1005,7 +1016,7 @@
                 // 技能数值分布图
                 const damageOption = {
                     title: {
-                        text: `${typeLabel}技能数值分布`,
+                        text: skillValueDistribution,
                         left: 'center',
                         textStyle: { color: '#e2e8f0' },
                     },
@@ -1024,7 +1035,7 @@
                     },
                     series: [
                         {
-                            name: `${typeLabel}技能数值`,
+                            name: skillValue,
                             type: 'pie',
                             radius: ['40%', '70%'],
                             avoidLabelOverlap: false,
@@ -1056,7 +1067,7 @@
                 // 暴击率/幸运触发率对比图
                 const critOption = {
                     title: {
-                        text: `${typeLabel}技能暴击率与幸运触发率`,
+                        text: skillCritAndLuckyRate,
                         left: 'center',
                         textStyle: { color: '#e2e8f0' },
                     },
@@ -1068,7 +1079,7 @@
                         textStyle: { color: '#ecf0f1' },
                     },
                     legend: {
-                        data: ['暴击率', '幸运触发率'],
+                        data: [getTranslationByReplace('暴击率'), getTranslationByReplace('幸运触发率')],
                         bottom: 10,
                         textStyle: { color: '#cbd5e0' },
                     },
@@ -1091,7 +1102,7 @@
                     },
                     yAxis: {
                         type: 'value',
-                        name: '百分比',
+                        name: getTranslationByReplace('百分比'),
                         min: 0,
                         max: 100,
                         axisLine: { lineStyle: { color: '#7f8c8d' } },
@@ -1100,13 +1111,13 @@
                     },
                     series: [
                         {
-                            name: '暴击率',
+                            name: getTranslationByReplace('暴击率'),
                             type: 'bar',
                             data: critRates,
                             itemStyle: { color: '#ff9966' },
                         },
                         {
-                            name: '幸运触发率',
+                            name: getTranslationByReplace('幸运触发率'),
                             type: 'bar',
                             data: luckyRates,
                             itemStyle: { color: '#93f9b9' },

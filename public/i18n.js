@@ -1,6 +1,35 @@
 // i18n functionality
-let currentLang = localStorage.getItem('lang') || 'zh';
+// 检测系统语言并返回最合适的语言代码
+function getSystemLanguage() {
+    const browserLang = navigator.language || 'en';
+    const langMap = {
+        zh: 'zh',
+        'zh-CN': 'zh',
+        'zh-TW': 'zh',
+        'zh-HK': 'zh',
+        'zh-SG': 'zh',
+        en: 'en',
+        'en-US': 'en',
+        'en-GB': 'en',
+        'en-CA': 'en',
+        'en-AU': 'en',
+    };
+
+    if (langMap[browserLang]) {
+        return langMap[browserLang];
+    }
+
+    const langPrefix = browserLang.split('-')[0];
+    if (langMap[langPrefix]) {
+        return langMap[langPrefix];
+    }
+
+    return 'en';
+}
+
+let currentLang = localStorage.getItem('lang') || getSystemLanguage();
 let translations = {};
+let translation_replacement = {};
 
 // 支持的语言列表
 const supportedLanguages = [
@@ -11,7 +40,9 @@ const supportedLanguages = [
 async function loadTranslations(lang) {
     try {
         const response = await fetch(`locales/${lang}.json`);
-        translations = await response.json();
+        const data = await response.json();
+        translations = data.translations || {};
+        translation_replacement = data.replacement || {};
     } catch (error) {
         console.error('Failed to load translations:', error);
     }
@@ -188,4 +219,8 @@ function updateActionButtons() {
             button.innerHTML = `<i class="icon">📊</i> ${translations.skillAnalysisBtn || '技能分析'}`;
         }
     });
+}
+
+function getTranslationByReplace(chi) {
+    return translation_replacement[chi] || chi;
 }
