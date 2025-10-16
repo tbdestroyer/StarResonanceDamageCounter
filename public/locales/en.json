@@ -196,6 +196,7 @@
         "协奏": "Concerto"
     },
     "replacement": {
+        "人": " Player",
         "伤害": "Damage",
         "治疗": "Healing",
         "其他": "Others",
