@@ -164,6 +164,7 @@
         "skillCritAndLuckyRate": "{typeLabel} Skill Critical and Lucky Trigger Rate"
     },
     "professions": {
+        "未知": "Unknown",
         "----PROFESSIONS----": "--------",
         "雷影剑士": "Stormblade",
         "冰魔导师": "Frost Mage",

@@ -164,6 +164,7 @@
         "skillCritAndLuckyRate": "{typeLabel}技能暴击率与幸运触发率"
     },
     "professions": {
+        "未知": "未知",
         "----PROFESSIONS----": "--------",
         "雷影剑士": "雷影剑士",
         "冰魔导师": "冰魔导师",
