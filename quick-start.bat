@@ -12,23 +12,17 @@ REM Change to script directory
 cd /d "%~dp0"
 
 echo [*] Starting damage counter server...
-start /B node server.js
-
-echo [*] Waiting for server initialization...
-timeout /t 5 /nobreak >nul
-
-echo [*] Starting overlay window...
-echo.
-echo Hotkey Guide:
-echo   F1 = Toggle View Mode    F7 = Toggle Damage Group
-echo   F2 = Toggle Visibility   F8 = Toggle Healing Group  
-echo   F3 = Clear Data         F9 = Toggle All Data
-echo   F4 = Pause/Resume       F10 = Hide Inactive Users
-echo   F5 = Export Data        F11 = Table Settings
-echo   F6 = Copy Window URL    F12 = Open Dev Tools
+echo [*] The server will ask you to:
+echo      1. Select network adapter (choose your main internet connection)
+echo      2. Select log level (choose 'info')  
+echo      3. Start overlay (choose 'y')
 echo.
 
-npx electron overlay-launcher.js
+node server.js
+
+echo.
+echo [*] Server has stopped.
+echo [*] If you want to restart, run this script again.
 
 echo.
 echo Application closed. Thanks for using the enhanced version!
