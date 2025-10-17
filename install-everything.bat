@@ -140,9 +140,12 @@ if not exist "package.json" (
 
 echo [*] Installing project dependencies...
 echo [*] This may take 2-5 minutes...
-npm install
+call npm install
 
-if %errorLevel% neq 0 (
+set NPM_EXIT_CODE=%errorLevel%
+echo [DEBUG] npm install exit code: %NPM_EXIT_CODE%
+
+if %NPM_EXIT_CODE% neq 0 (
     echo [X] Failed to install dependencies!
     echo.
     echo Troubleshooting:
@@ -154,6 +157,7 @@ if %errorLevel% neq 0 (
 )
 
 echo [✓] Dependencies installed successfully!
+echo [*] Continuing to Electron installation...
 
 echo.
 echo ===============================================
@@ -162,9 +166,12 @@ echo ===============================================
 echo.
 
 echo [*] Installing Electron framework...
-npm install electron --save-dev
+call npm install electron --save-dev
 
-if %errorLevel% neq 0 (
+set ELECTRON_EXIT_CODE=%errorLevel%
+echo [DEBUG] Electron install exit code: %ELECTRON_EXIT_CODE%
+
+if %ELECTRON_EXIT_CODE% neq 0 (
     echo [X] Failed to install Electron!
     pause
     exit /b 1
