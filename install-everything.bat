@@ -91,7 +91,9 @@ echo  STEP 2: NPCAP NETWORK CAPTURE
 echo ===============================================
 echo.
 
-REM Check if we can load network capture (rough check)
+REM Create temp directory if it doesn't exist
+if not exist "temp" mkdir temp
+
 echo [*] Downloading Npcap installer...
 
 REM Download Npcap installer
