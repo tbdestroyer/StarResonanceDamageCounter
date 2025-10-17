@@ -5,7 +5,7 @@ title Star Resonance Damage Counter - First Time Setup
 
 echo ===============================================
 echo  Star Resonance Damage Counter
-echo  FIRST TIME SETUP & REQUIREMENTS CHECK
+echo  FIRST TIME SETUP AND REQUIREMENTS CHECK
 echo ===============================================
 echo.
 
@@ -36,18 +36,51 @@ node --version >nul 2>&1
 if %errorLevel% neq 0 (
     echo [X] Node.js not installed!
     echo.
-    echo REQUIRED: Node.js v18+ is required for this application.
-    echo.
-    echo Please follow these steps:
-    echo  1. Go to https://nodejs.org/
-    echo  2. Download the LTS version (recommended)
-    echo  3. Run the installer with default settings
-    echo  4. Restart your computer
-    echo  5. Run this setup script again
-    echo.
-    echo The installer will also install npm (Node Package Manager) automatically.
-    pause
-    goto :end
+    echo Would you like me to download and install Node.js automatically?
+    set /p auto_install="Auto-install Node.js? (y/n): "
+    
+    if /i "!auto_install!"=="y" (
+        echo.
+        echo [*] Downloading Node.js LTS installer...
+        echo [*] This may take a few minutes depending on your connection...
+        
+        REM Download Node.js LTS installer
+        powershell -Command "& {Invoke-WebRequest -Uri 'https://nodejs.org/dist/v20.18.0/node-v20.18.0-x64.msi' -OutFile 'nodejs_installer.msi'}"
+        
+        if exist "nodejs_installer.msi" (
+            echo [*] Download complete! Installing Node.js...
+            echo [!] Please click through the installer when it appears
+            echo [!] Use default settings (just click Next/Install)
+            
+            REM Install Node.js silently
+            msiexec /i nodejs_installer.msi /quiet /norestart
+            
+            echo [*] Installation complete! Cleaning up...
+            del nodejs_installer.msi
+            
+            echo [✓] Node.js has been installed!
+            echo [!] You may need to restart your command prompt or computer
+            echo [!] Close this window and run setup.bat again to continue
+            pause
+            exit /b 0
+        ) else (
+            echo [X] Download failed! 
+            echo [!] Please install manually from: https://nodejs.org/
+            pause
+            goto :end
+        )
+    ) else (
+        echo.
+        echo MANUAL INSTALLATION REQUIRED:
+        echo  1. Go to https://nodejs.org/
+        echo  2. Download the LTS version (recommended)
+        echo  3. Run the installer with default settings
+        echo  4. Restart your computer
+        echo  5. Run this setup script again
+        echo.
+        pause
+        goto :end
+    )
 ) else (
     for /f "tokens=*" %%i in ('node --version') do set NODE_VERSION=%%i
     echo [✓] Node.js is installed: !NODE_VERSION!
