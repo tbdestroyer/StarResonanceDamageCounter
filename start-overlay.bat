@@ -31,13 +31,13 @@ if %errorLevel% neq 0 (
 
 echo.
 echo [2/6] Checking npm/package manager...
-npm --version >nul 2>&1
+call npm --version >nul 2>&1
 if %errorLevel% neq 0 (
     echo [X] npm not found! Node.js installation may be incomplete.
     pause
     exit /b 1
 ) else (
-    for /f "tokens=*" %%i in ('npm --version') do set NPM_VERSION=%%i
+    for /f "tokens=*" %%i in ('call npm --version') do set NPM_VERSION=%%i
     echo [✓] npm found: !NPM_VERSION!
 )
 
