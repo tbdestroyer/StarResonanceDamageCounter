@@ -202,7 +202,7 @@ echo ===============================================
 echo.
 echo To start the enhanced Star Resonance Damage Counter:
 echo.
-echo  Option 1: Double-click "start-overlay.bat"
+echo  Option 1: Double-click "quick-start.bat" (recommended)
 echo  Option 2: Run "node server.js" in command prompt
 echo.
 echo Enhanced Features Include:

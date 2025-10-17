@@ -5,6 +5,7 @@ let isVisible = true;
 let mouseEventsIgnored = true; // Track this manually
 
 function createOverlay() {
+    console.log('Creating overlay window...');
     overlayWindow = new BrowserWindow({
         width: 400,  // Slightly larger for easier resizing
         height: 300,
@@ -27,8 +28,22 @@ function createOverlay() {
     overlayWindow.setAlwaysOnTop(true, 'screen-saver');
     overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
 
-    // Load the compact overlay route instead of the main page
-    overlayWindow.loadURL('http://localhost:8989/?overlay=compact');
+    // Add a small delay to ensure server is ready, then load the URL
+    setTimeout(() => {
+        console.log('Loading overlay URL...');
+        overlayWindow.loadURL('http://localhost:8989/?overlay=compact');
+    }, 1000);
+    
+    overlayWindow.on('closed', () => {
+        console.log('Overlay window was closed');
+        overlayWindow = null;
+    });
+
+    overlayWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+        console.log(`Failed to load URL: ${validatedURL}`);
+        console.log(`Error: ${errorCode} - ${errorDescription}`);
+        // Don't close the app on load failure, keep window open
+    });
     
     // Wait for page to load, then inject overlay mode
     overlayWindow.webContents.once('dom-ready', () => {
@@ -424,8 +439,10 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
+    console.log('All windows closed');
     globalShortcut.unregisterAll();
     if (process.platform !== 'darwin') {
+        console.log('Quitting application');
         app.quit();
     }
 });

@@ -1668,21 +1668,32 @@ async function main() {
         console.log('');
         
         try {
-            // Use local electron installation
-            const electronPath = path.join(__dirname, 'node_modules', '.bin', 'electron.cmd');
+            // Use local electron installation - try multiple possible paths
+            const electronPaths = [
+                path.join(__dirname, 'node_modules', '.bin', 'electron.cmd'),
+                path.join(__dirname, 'node_modules', '.bin', 'electron'),
+                path.join(__dirname, 'node_modules', 'electron', 'dist', 'electron.exe')
+            ];
             
-            // Check if electron exists locally first
-            if (fs.existsSync(electronPath)) {
+            let electronPath = null;
+            for (const ePath of electronPaths) {
+                if (fs.existsSync(ePath)) {
+                    electronPath = ePath;
+                    break;
+                }
+            }
+            
+            if (electronPath) {
                 overlayProcess = spawn(electronPath, ['overlay-launcher.js'], {
                     cwd: __dirname,
-                    stdio: 'pipe',
+                    stdio: 'inherit',
                     shell: true
                 });
             } else {
-                // Fallback to npx
+                // Fallback to npx (this is what we confirmed works)
                 overlayProcess = spawn('npx', ['electron', 'overlay-launcher.js'], {
                     cwd: __dirname,
-                    stdio: 'pipe',
+                    stdio: 'inherit',
                     shell: true
                 });
             }
