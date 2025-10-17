@@ -2,9 +2,11 @@
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-brightgreen.svg)](https://www.gnu.org/licenses/agpl-3.0.txt)
 [![Node.js](https://img.shields.io/badge/Node.js-22%2B-green.svg)](https://nodejs.org/)
-[![pnpm](https://img.shields.io/badge/pnpm-10.13.1-orange.svg)](https://pnpm.io/)
+[![npm](https://img.shields.io/badge/npm-included%20with%20Node.js-red.svg)](https://www.npmjs.com/)
 
 一个用于《星痕共鸣》游戏的实时战斗数据统计工具，通过网络抓包技术实时分析战斗数据，提供伤害统计、DPS 计算等功能。
+
+**🎉 Enhanced Version with Zero-Prerequisites Installation!**
 
 该工具的数据准确性已经经过多次实际战斗验证，在网络环境稳定的情况下暂未发现数据丢失的问题。
 
@@ -12,19 +14,47 @@
 
 [介绍视频](https://www.bilibili.com/video/BV1T4hGzGEeX/)
 
+## 🚀 Quick Start (Zero Prerequisites)
+
+**For users with nothing installed:**
+
+1. **Download** this project (extract ZIP file)
+2. **Double-click:** `install-everything.bat`
+3. **Follow prompts** (takes 5-10 minutes) 
+4. **Launch:** `quick-start.bat`
+
+That's it! Everything downloads and installs automatically.
+
 ## ✨ 功能特性
 
+### 🎮 游戏体验优化
 - 🎯 **实时伤害统计** - 实时捕获并统计战斗中的伤害数据
 - 📊 **DPS 计算** - 提供瞬时 DPS 和总体 DPS 计算
 - 🎲 **详细分类** - 区分普通伤害、暴击伤害、幸运伤害等类型
 - 🌐 **Web 界面** - 提供美观的实时数据展示界面，折线图展示
 - 🌙 **主题切换** - 支持日间/夜间模式切换
+-  **统计分析** - 暴击率、幸运率等详细统计信息
+
+### 🎯 增强版专属功能
+- 🖥️ **游戏覆盖层** - 始终保持在游戏窗口顶层显示
+- ⌨️ **快捷键支持** - F1-F12 快速切换数据视图和窗口模式
+- 🌍 **多语言支持** - 支持中文/英文界面切换
 - 🔄 **自动刷新** - 数据实时更新，无需手动刷新
-- 📈 **统计分析** - 暴击率、幸运率等详细统计信息
 
 ## 🚀 快速开始
 
-### 一键使用
+### ⚡ 零基础用户 (推荐)
+
+如果你的电脑没有安装任何开发工具，使用以下一键安装：
+
+1. **下载项目** - 点击绿色的 "Code" 按钮 → "Download ZIP" 并解压
+2. **运行安装** - 双击 `install-everything.bat` 
+3. **等待完成** - 程序会自动下载并安装所需软件 (5-10分钟)
+4. **启动工具** - 双击 `quick-start.bat`
+
+✅ **自动安装内容：** Node.js, npm 依赖包, Npcap 网络抓包驱动
+
+### 📦 一键下载版本
 
 前往 [GitHub Actions 页面](https://github.com/dmlgzs/StarResonanceDamageCounter/actions) 下载最新自动打包版本。
 
@@ -32,19 +62,22 @@
 
 前往 [夸克网盘](https://pan.quark.cn/s/89c4795e0751) 下载发布版本。
 
-### 手动编译
+### 🔧 开发者用户
+
+如果你已有 Node.js 环境：
+
+```bash
+npm install
+node server.js
+```
+
+### 🛠️ 手动编译
 
 #### 前置要求
 
-- **Node.js** >= 22.15.0
-- **pnpm** >= 10.13.1
+- **Node.js** >= 20.0.0
+- **npm** (included with Node.js)
 - **WinPcap/Npcap** (网络抓包驱动)
-- **Visual Studio Build Tools** (编译依赖)
-  - 可通过 [Visual Studio Installer](https://visualstudio.microsoft.com/visual-cpp-build-tools/) 安装
-  - 选择“C++ 生成工具”工作负载
-- **Python** 3.10 (编译依赖)
-  - 可通过 [Python 官网](https://www.python.org/downloads/) 下载并安装
-  - 确保 Python 添加到系统 PATH 中
 
 #### 安装步骤
 
@@ -58,8 +91,7 @@
 2. **安装依赖**
 
    ```bash
-   corepack enable
-   pnpm install
+   npm install
    ```
 
 3. **安装 WinPcap/Npcap**
@@ -117,6 +149,40 @@
 4. **查看数据**
    - 打开浏览器访问：`http://localhost:8989`
    - 实时查看战斗数据统计
+
+## 🎮 增强版使用指南
+
+### 🚀 游戏覆盖层模式
+
+使用零基础安装后，工具会启动一个始终保持在游戏顶层的覆盖窗口：
+
+- **自动启动** - `quick-start.bat` 会同时启动服务器和覆盖层
+- **游戏兼容** - 支持全屏游戏，覆盖层始终可见
+- **透明界面** - 不影响游戏操作，数据清晰显示
+
+### ⌨️ 快捷键操作
+
+| 快捷键 | 功能描述 |
+|--------|----------|
+| **F1** | 切换数据视图（伤害/治疗/图表） |
+| **F2** | 切换主题（日间/夜间模式） |
+| **F3** | 切换语言（中文/English） |
+| **F4** | 窗口透明度调节 |
+| **F5** | 清空所有数据 |
+| **F6** | 切换窗口大小（紧凑/标准） |
+| **F12** | 显示/隐藏覆盖层 |
+
+### 🔧 高级使用
+
+**只需要网页版：**
+```bash
+node server.js
+```
+
+**启动游戏覆盖层：**
+```bash
+node overlay-launcher.js
+```
 
 ## 📱 Web 界面功能
 
