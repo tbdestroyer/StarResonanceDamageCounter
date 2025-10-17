@@ -1,0 +1,21 @@
+FALSE POSITIVE INFORMATION
+==========================
+
+This application may be flagged by antivirus software due to legitimate features:
+
+1. Network Packet Capture - Monitors game network traffic for damage counting
+2. System Integration - Creates overlay windows for game integration
+3. File Operations - Saves configuration and log files
+4. Browser Automation - Opens web interface automatically
+
+WHAT TO DO IF FLAGGED:
+- Add the executable to your antivirus whitelist/exclusions
+- This is a false positive - the code is open source and auditable
+- You can verify the source code at: https://github.com/dmlgzs/StarResonanceDamageCounter
+
+COMMON TRIGGERS:
+- Discord file uploads may be blocked
+- Windows Defender may show warnings
+- Some antivirus programs flag network monitoring tools
+
+The application is safe and does not contain malware.

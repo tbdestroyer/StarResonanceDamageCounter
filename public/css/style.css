@@ -1436,3 +1436,310 @@ tr:nth-child(even) {
 .lang-option:only-child {
     border-radius: 5px;
 }
+
+/* Overlay Mode Styles - Add this to the end of style.css */
+
+/* Detect overlay mode via URL parameter */
+body.overlay-mode {
+    background: rgba(25, 25, 25, 0.98) !important;
+    padding: 1px !important;
+    margin: 0 !important;
+    font-size: 7px !important;
+    overflow: hidden !important;
+    max-height: 100vh !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    line-height: 1 !important;
+    transform-origin: top left !important;
+}
+
+/* Apply zoom only to table area, not chart */
+.overlay-mode .table-container {
+    zoom: var(--overlay-zoom, 1) !important;
+    transform-origin: top left !important;
+}
+
+/* Hide unnecessary UI elements, keep only data tables and charts */
+.overlay-mode h1,
+.overlay-mode footer,
+.overlay-mode .lang-dropdown,
+.overlay-mode #langToggle,
+.overlay-mode .server-status,
+.overlay-mode select,
+.overlay-mode .sort-controls,
+.overlay-mode label[for*="sort"],
+.overlay-mode .data-group-controls,
+.overlay-mode .main-button,
+.overlay-mode button,
+.overlay-mode .user-controls,
+.overlay-mode .enemy-summary,
+.overlay-mode .enemy-list,
+.overlay-mode .enemy-item {
+    display: none !important;
+}
+
+/* All buttons and controls are now hidden in overlay mode */
+
+/* Compact card styling for overlay */
+.overlay-mode .card {
+    margin: 0 !important;
+    padding: 2px !important;
+    max-width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Compact chart container for overlay - RESPONSIVE READABLE SIZE */
+.overlay-mode .chart-container {
+    margin: 0 !important;
+    padding: 8px !important;
+    width: 100% !important;
+    background: rgba(20, 20, 20, 0.98) !important;
+    border: 1px solid rgba(100, 150, 255, 0.3) !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    min-height: 100px !important;
+    max-height: 160px !important;
+    position: relative !important;
+    overflow: visible !important;
+}
+
+/* Improve chart rendering */
+.overlay-mode .chart-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    image-rendering: crisp-edges !important;
+    image-rendering: -webkit-crisp-edges !important;
+    image-rendering: pixelated !important;
+}
+
+/* Chart div container */
+.overlay-mode #dpsChart {
+    width: 100% !important;
+    height: 120px !important;
+    min-height: 100px !important;
+    position: relative !important;
+}
+
+.overlay-mode canvas {
+    width: 100% !important;
+    height: auto !important;
+    min-width: 300px !important; /* Minimum for readability */
+    min-height: 60px !important;
+    max-width: 600px !important; /* Maximum for optimal size */
+    max-height: 120px !important;
+    display: block !important;
+    margin: 0 auto !important;
+    transform-origin: center center !important;
+}
+
+/* Compact table styling - keep all the detailed columns */
+.overlay-mode .table-container {
+    max-height: 160px !important;
+    font-size: 8px !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: rgba(30, 30, 30, 0.95) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+}
+
+.overlay-mode table {
+    background: transparent !important;
+    border-collapse: collapse !important;
+}
+
+.overlay-mode th {
+    background: rgba(70, 130, 180, 0.9) !important;
+    padding: 0px 2px !important;
+    font-size: 7px !important;
+    color: white !important;
+    white-space: nowrap !important;
+    border: 1px solid rgba(70, 130, 180, 0.3) !important;
+    font-weight: bold !important;
+    line-height: 1 !important;
+    height: 12px !important;
+}
+
+.overlay-mode td {
+    padding: 0px 1px !important;
+    font-size: 7px !important;
+    border: 1px solid rgba(70, 130, 180, 0.2) !important;
+    color: white !important;
+    white-space: nowrap !important;
+    background: rgba(40, 40, 40, 0.7) !important;
+    line-height: 1 !important;
+    height: 11px !important;
+}
+
+/* Enemy HP sections are now hidden in overlay mode */
+
+/* Compact sort and filter controls */
+.overlay-mode select {
+    font-size: 8px !important;
+    padding: 1px 2px !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    color: white !important;
+    border: 1px solid rgba(0, 150, 255, 0.5) !important;
+}
+
+/* Make sure all text is readable */
+.overlay-mode * {
+    color: white !important;
+}
+
+.overlay-mode tr:nth-child(even) td {
+    background: rgba(50, 50, 50, 0.7) !important;
+}
+
+.overlay-mode tr:hover td {
+    background: rgba(70, 130, 180, 0.3) !important;
+}
+
+/* Compact scrollbars */
+.overlay-mode .table-container::-webkit-scrollbar {
+    width: 4px !important;
+}
+
+.overlay-mode .table-container::-webkit-scrollbar-thumb {
+    background: rgba(0, 150, 255, 0.6) !important;
+    border-radius: 2px !important;
+}
+
+/* Keep modals but make them smaller */
+.overlay-mode .modal {
+    transform: scale(0.8) !important;
+    font-size: 10px !important;
+}
+
+/* View Toggle Styles */
+.overlay-mode.view-chart-only .table-container {
+    display: none !important;
+}
+
+.overlay-mode.view-table-only .chart-container {
+    display: none !important;
+}
+
+.overlay-mode.view-both .chart-container,
+.overlay-mode.view-both .table-container {
+    display: block !important;
+}
+
+/* View indicator - show current mode in corner */
+.overlay-mode::before {
+    content: attr(data-view-mode);
+    position: fixed;
+    top: 2px;
+    right: 2px;
+    background: rgba(0, 100, 200, 0.8);
+    color: white;
+    padding: 2px 6px;
+    font-size: 8px;
+    border-radius: 3px;
+    z-index: 10000;
+    font-weight: bold;
+}
+
+/* Simple mode enhancements for overlay */
+.overlay-mode.simple-mode .damage-detail-cols,
+.overlay-mode.simple-mode .healing-detail-cols {
+    display: none !important;
+}
+
+.overlay-mode.simple-mode .damage-main-col,
+.overlay-mode.simple-mode .healing-main-col {
+    display: none !important;
+}
+
+.overlay-mode.simple-mode .damage-simple-col,
+.overlay-mode.simple-mode .healing-simple-col {
+    display: table-cell !important;
+}
+
+/* Hide fluff columns in overlay until "All Data" mode is selected */
+.overlay-mode th[data-i18n="critRate"],
+.overlay-mode th[data-i18n-title="critRateTitle"],
+.overlay-mode th[data-i18n="luckyRate"],
+.overlay-mode th[data-i18n-title="luckyRateTitle"],  
+.overlay-mode th[data-i18n="combatPower"],
+.overlay-mode th[data-i18n="fightPoint"],
+.overlay-mode th[data-i18n="rating"],
+.overlay-mode th[data-i18n="actions"],
+.overlay-mode .operation-div {
+    display: none !important;
+}
+
+/* Hide corresponding table cells for fluff columns */
+.overlay-mode td:nth-child(4), /* Rating/Combat Power */
+.overlay-mode td:nth-child(8), /* Crit Rate */  
+.overlay-mode td:nth-child(9), /* Lucky Rate */
+.overlay-mode td:last-child    /* Actions column */
+{
+    display: none !important;
+}
+
+/* Show fluff columns only in "All Data" mode */
+.overlay-mode[data-current-group="all"] th[data-i18n="critRate"],
+.overlay-mode[data-current-group="all"] th[data-i18n-title="critRateTitle"],
+.overlay-mode[data-current-group="all"] th[data-i18n="luckyRate"],
+.overlay-mode[data-current-group="all"] th[data-i18n-title="luckyRateTitle"],
+.overlay-mode[data-current-group="all"] th[data-i18n="combatPower"],
+.overlay-mode[data-current-group="all"] th[data-i18n="fightPoint"],
+.overlay-mode[data-current-group="all"] th[data-i18n="rating"],
+.overlay-mode[data-current-group="all"] th[data-i18n="actions"],
+.overlay-mode[data-current-group="all"] .operation-div {
+    display: table-cell !important;
+}
+
+.overlay-mode[data-current-group="all"] td:nth-child(4),
+.overlay-mode[data-current-group="all"] td:nth-child(8),
+.overlay-mode[data-current-group="all"] td:nth-child(9),
+.overlay-mode[data-current-group="all"] td:last-child {
+    display: table-cell !important;
+}
+
+/* Make simple mode indicator more prominent in overlay */
+.overlay-mode.simple-mode::before {
+    background: rgba(76, 175, 80, 0.9) !important;
+    box-shadow: 0 0 4px rgba(76, 175, 80, 0.5) !important;
+}
+
+/* Color-coded table rows */
+.overlay-mode tr[data-user-color] {
+    transition: background-color 0.3s ease, border-color 0.3s ease !important;
+}
+
+.overlay-mode tr[data-user-color]:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    transform: translateX(2px) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Improve readability with color-coded rows */
+.overlay-mode tr[data-user-color] td {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Main table color coding (non-overlay) */
+tr[data-user-color] {
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+tr[data-user-color]:hover {
+    filter: brightness(1.1);
+    transform: translateX(1px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark mode adjustments for color-coded rows */
+.dark-mode tr[data-user-color] {
+    border-left-width: 3px;
+    border-left-style: solid;
+}
+
+.dark-mode tr[data-user-color]:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}

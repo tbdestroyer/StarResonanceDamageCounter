@@ -459,7 +459,6 @@ class PacketProcessor {
         try {
             const syncContainerData = pb.SyncContainerData.decode(payloadBuffer);
             // this.logger.debug(JSON.stringify(syncContainerData, null, 2));
-            // fs.writeFileSync('SyncContainerData.json', JSON.stringify(syncContainerData, null, 2));
 
             if (!syncContainerData.VData) return;
             const vData = syncContainerData.VData;
@@ -485,7 +484,7 @@ class PacketProcessor {
             if (professionList.CurProfessionId)
                 this.userDataManager.setProfession(playerUid, getProfessionNameFromId(professionList.CurProfessionId));
         } catch (err) {
-            fs.writeFileSync('./SyncContainerData.dat', payloadBuffer);
+            // fs.writeFileSync('./SyncContainerData.dat', payloadBuffer);
             this.logger.warn(`Failed to decode SyncContainerData for player ${currentUserUuid.shiftRight(16)}. Please report to developer`);
             throw err;
         }

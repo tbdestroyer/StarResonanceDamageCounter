@@ -1202,13 +1202,30 @@
                     // 基于用户ID的哈希值分配颜色，确保同一个用户总是得到相同的颜色
                     let hash = 0;
                     for (let i = 0; i < userIdStr.length; i++) {
-                        hash = (hash << 5) - hash + userIdStr.charCodeAt(i);
+                        hash = (hash <- 5) - hash + userIdStr.charCodeAt(i);
                         hash |= 0;
                     }
                     const idx = Math.abs(hash) % palette.length;
                     userColorMap[userIdStr] = palette[idx];
                 }
                 return userColorMap[userIdStr];
+            }
+            
+            // Update table row colors when users change
+            function updateTableRowColors() {
+                const rows = document.querySelectorAll('tr[data-user-id]');
+                rows.forEach(row => {
+                    const userId = row.getAttribute('data-user-id');
+                    const currentColor = getUserColor(userId);
+                    const storedColor = row.getAttribute('data-user-color');
+                    
+                    // Update if color changed (theme switch or new user)
+                    if (currentColor !== storedColor) {
+                        row.style.backgroundColor = currentColor + '20';
+                        row.style.borderLeft = `3px solid ${currentColor}`;
+                        row.setAttribute('data-user-color', currentColor);
+                    }
+                });
             }
 
             // 服务器状态提示管理
@@ -1572,6 +1589,13 @@
                     }
                 }
                 existingRows = damageTable.querySelectorAll('tr');
+                
+                // Update colors after table structure changes
+                setTimeout(() => {
+                    if (typeof updateTableRowColors === 'function') {
+                        updateTableRowColors();
+                    }
+                }, 50);
 
                 for (let i = 0; i < visibleUserArray.length; i++) {
                     const user = visibleUserArray[i];
@@ -1579,6 +1603,16 @@
                     const lucky_rate = user.total_count.lucky / user.total_count.total;
 
                     const row = existingRows[i];
+                    
+                    // Apply color coding to match chart lines
+                    const userId = user.uid || user.id;
+                    const userColor = getUserColor(userId);
+                    
+                    // Set row background with user's chart color (semi-transparent)
+                    row.style.backgroundColor = userColor + '20'; // Add 20 for ~12% opacity
+                    row.style.borderLeft = `3px solid ${userColor}`;
+                    row.setAttribute('data-user-id', userId);
+                    row.setAttribute('data-user-color', userColor);
 
                     const isSimpleMode = document.body.classList.contains('simple-mode');
 
@@ -1821,6 +1855,11 @@
                     body.classList.add('dark-mode');
                     button.textContent = translations.darkModeOff || '☀️ 日间模式';
                     localStorage.setItem('darkMode', 'true');
+                }
+                
+                // Update table row colors for new theme
+                if (typeof updateTableRowColors === 'function') {
+                    updateTableRowColors();
                 }
             }
 

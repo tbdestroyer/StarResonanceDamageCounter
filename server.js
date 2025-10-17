@@ -17,10 +17,31 @@ const decoders = cap.decoders;
 const PROTOCOL = decoders.PROTOCOL;
 const print = console.log;
 const app = express();
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 const findDefaultNetworkDevice = require('./algo/netInterfaceUtil');
 
 const skillConfig = require('./tables/skill_names_new.json');
+const skillConfigEn = require('./tables/skill_names_en.json');
+const monsterNames = require('./tables/monster_names.json');
+const monsterNamesEn = require('./tables/monster_names_en.json');
+
+// Function to get translated skill name
+function getSkillName(skillId, lang = 'zh') {
+    const skillIdStr = String(skillId);
+    if (lang === 'en' && skillConfigEn[skillIdStr]) {
+        return skillConfigEn[skillIdStr];
+    }
+    return skillConfig[skillIdStr] || skillId;
+}
+
+// Function to get translated monster name
+function getMonsterName(monsterId, lang = 'zh') {
+    const monsterIdStr = String(monsterId);
+    if (lang === 'en' && monsterNamesEn[monsterIdStr]) {
+        return monsterNamesEn[monsterIdStr];
+    }
+    return monsterNames[monsterIdStr] || `Monster_${monsterId}`;
+}
 const VERSION = '3.3.1';
 const SETTINGS_PATH = path.join('./settings.json');
 let globalSettings = {
@@ -37,6 +58,7 @@ const devices = cap.deviceList();
 
 // 暂停统计状态
 let isPaused = false;
+let overlayProcess = null;
 
 function warnAndExit(text) {
     console.log(`\x1b[31m${text}\x1b[0m`);
@@ -300,7 +322,7 @@ class UserData {
     addDamage(skillId, element, damage, isCrit, isLucky, isCauseLucky, hpLessenValue = 0) {
         this.damageStats.addRecord(damage, isCrit, isLucky, hpLessenValue);
         // 记录技能使用情况
-        const skillName = skillConfig[skillId] ?? skillId;
+        const skillName = getSkillName(skillId, 'en'); // Use English names by default
         if (!this.skillUsage.has('伤害-' + skillName)) {
             this.skillUsage.set('伤害-' + skillName, new StatisticData(this, '伤害', element, skillName));
         }
@@ -324,7 +346,7 @@ class UserData {
     addHealing(skillId, element, healing, isCrit, isLucky, isCauseLucky) {
         this.healingStats.addRecord(healing, isCrit, isLucky);
         // 记录技能使用情况
-        const skillName = skillConfig[skillId] ?? skillId;
+        const skillName = getSkillName(skillId, 'en'); // Use English names by default
         if (!this.skillUsage.has('治疗-' + skillName)) {
             this.skillUsage.set('治疗-' + skillName, new StatisticData(this, '治疗', element, skillName));
         }
@@ -1608,6 +1630,108 @@ async function main() {
             clearTcpCache();
         }
     }, 10000);
+
+    function askForOverlay() {
+        console.log('\nDo you want to start the overlay? (y/n):');
+        
+        const readline = require('readline');
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        
+        rl.question('', (answer) => {
+            const response = answer.toLowerCase().trim();
+            
+            if (response === 'y' || response === 'yes') {
+                startOverlay();
+            } else {
+                console.log('Overlay not started. You can access the web interface at http://localhost:8989');
+            }
+            
+            rl.close();
+        });
+    }
+
+    function startOverlay() {
+        console.log('\nStarting overlay...');
+        console.log('Overlay Hotkeys:');
+        console.log('  F1  - Toggle simple mode (show/hide detailed columns)');
+        console.log('  F2  - Show Damage/DPS only');
+        console.log('  F3  - Show Healing/HPS only');
+        console.log('  F4  - Show All Data');
+        console.log('  F5  - Toggle Hide Inactive users');
+        console.log('  F9  - Toggle visibility');
+        console.log('  F10 - Toggle mouse interaction');
+        console.log('  F11 - Toggle view mode (Both/Chart/Table)');
+        console.log('  F12 - Toggle opacity');
+        console.log('');
+        
+        try {
+            // Use local electron installation
+            const electronPath = path.join(__dirname, 'node_modules', '.bin', 'electron.cmd');
+            
+            // Check if electron exists locally first
+            if (fs.existsSync(electronPath)) {
+                overlayProcess = spawn(electronPath, ['overlay-launcher.js'], {
+                    cwd: __dirname,
+                    stdio: 'pipe',
+                    shell: true
+                });
+            } else {
+                // Fallback to npx
+                overlayProcess = spawn('npx', ['electron', 'overlay-launcher.js'], {
+                    cwd: __dirname,
+                    stdio: 'pipe',
+                    shell: true
+                });
+            }
+            
+            overlayProcess.on('error', (err) => {
+                console.log('Overlay error:', err.message);
+                console.log('Make sure electron is installed: npm install electron');
+                console.log('You can still access the web interface at http://localhost:8989');
+            });
+            
+            overlayProcess.on('close', (code) => {
+                console.log(`Overlay closed (code: ${code})`);
+                overlayProcess = null;
+            });
+            
+            console.log('Overlay started successfully!');
+            
+        } catch (err) {
+            console.log('Failed to start overlay:', err.message);
+            console.log('You can still access the web interface at http://localhost:8989');
+        }
+    }
+
+    // Replace the existing logic flow:
+    // 1. Select network adapter
+    // 2. Select log level
+    // 3. Ask about overlay <- ADD THIS
+    // 4. Start packet capture
+
+    askForOverlay();
+
+    // Handle graceful shutdown
+    process.on('SIGINT', () => {
+        console.log('\nShutting down...');
+
+        if (overlayProcess) {
+            overlayProcess.kill();
+        }
+
+        process.exit(0);
+    });
+
+    process.on('SIGTERM', () => {
+        if (overlayProcess) {
+            overlayProcess.kill();
+        }
+
+        process.exit(0);
+    });
 }
 
 if (!zlib.zstdDecompressSync) {
@@ -1617,3 +1741,235 @@ if (!zlib.zstdDecompressSync) {
 }
 
 main();
+
+// Add this route where your other routes are defined (look for other app.get() calls)
+app.get('/overlay', (req, res) => {
+    res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Damage Counter Overlay</title>
+        <meta http-equiv="refresh" content="2">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
+            body {
+                font-family: 'Consolas', 'Monaco', monospace;
+                font-size: 12px;
+                background: rgba(0, 20, 40, 0.95);
+                color: white;
+                padding: 8px;
+                overflow: hidden;
+            }
+            
+            .header {
+                text-align: center;
+                background: rgba(0, 100, 200, 0.8);
+                padding: 4px;
+                margin-bottom: 8px;
+                border-radius: 4px;
+                font-weight: bold;
+                font-size: 11px;
+            }
+            
+            .stats-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+            
+            .stat-box {
+                background: rgba(255, 255, 255, 0.1);
+                padding: 4px 6px;
+                border-radius: 3px;
+                text-align: center;
+                border-left: 3px solid #4ecdc4;
+            }
+            
+            .stat-label {
+                font-size: 9px;
+                color: #ccc;
+                display: block;
+            }
+            
+            .stat-value {
+                font-size: 12px;
+                font-weight: bold;
+                color: #ffe66d;
+            }
+            
+            .damage-table {
+                width: 100%;
+                font-size: 11px;
+                border-collapse: collapse;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 4px;
+                overflow: hidden;
+            }
+            
+            .damage-table th {
+                background: rgba(0, 100, 200, 0.8);
+                padding: 3px 4px;
+                font-size: 10px;
+                font-weight: bold;
+            }
+            
+            .damage-table td {
+                padding: 2px 4px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                text-align: right;
+            }
+            
+            .damage-table td:first-child {
+                text-align: left;
+                color: #4ecdc4;
+                font-weight: bold;
+            }
+            
+            .damage-table tr:nth-child(2) {
+                background: rgba(255, 107, 53, 0.1);
+                border-left: 3px solid #ff6b35;
+            }
+            
+            .damage-table tr:nth-child(3) {
+                background: rgba(78, 205, 196, 0.1);
+                border-left: 3px solid #4ecdc4;
+            }
+            
+            .damage-table tr:nth-child(4) {
+                background: rgba(255, 230, 109, 0.1);
+                border-left: 3px solid #ffe66d;
+            }
+            
+            .timestamp {
+                position: absolute;
+                bottom: 2px;
+                right: 4px;
+                font-size: 8px;
+                color: rgba(255, 255, 255, 0.5);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">SR Damage Counter</div>
+        
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-label">Total DPS</span>
+                <span class="stat-value" id="totalDps">0</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Active Players</span>
+                <span class="stat-value" id="playerCount">0</span>
+            </div>
+        </div>
+        
+        <table class="damage-table">
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>DPS</th>
+                    <th>%</th>
+                </tr>
+            </thead>
+            <tbody id="damageTableBody">
+                <tr>
+                    <td colspan="3" style="text-align: center; color: #999; font-style: italic;">
+                        Waiting for damage data...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div class="timestamp">${new Date().toLocaleTimeString()}</div>
+        
+        <script>
+            // Add JavaScript to fetch and display your damage data
+            // This should match your existing data structure
+            function updateOverlayData() {
+                // You'll need to modify this to fetch your actual damage data
+                // This is just a placeholder structure
+                fetch('/api/damage-data') // You'll need to create this endpoint
+                    .then(response => response.json())
+                    .then(data => {
+                        updateDisplay(data);
+                    })
+                    .catch(err => {
+                        console.log('Error fetching data:', err);
+                    });
+            }
+            
+            function updateDisplay(data) {
+                // Update total DPS
+                document.getElementById('totalDps').textContent = data.totalDps || '0';
+                document.getElementById('playerCount').textContent = data.playerCount || '0';
+                
+                // Update table
+                const tbody = document.getElementById('damageTableBody');
+                if (data.players && data.players.length > 0) {
+                    tbody.innerHTML = data.players.map(player => 
+                        '<tr>' +
+                        '<td>' + player.name + '</td>' +
+                        '<td>' + player.dps + '</td>' +
+                        '<td>' + player.percentage + '%</td>' +
+                        '</tr>'
+                    ).join('');
+                }
+            }
+            
+            // Update every 2 seconds
+            setInterval(updateOverlayData, 2000);
+            updateOverlayData();
+        </script>
+    </body>
+    </html>
+    `);
+});
+
+// Add API endpoint for overlay data (add this near your other routes)
+app.get('/api/damage-data', (req, res) => {
+    // You'll need to modify this to return your actual damage statistics
+    // This should match your existing data structure
+    
+    const damageData = {
+        totalDps: 0,
+        playerCount: 0,
+        players: []
+    };
+    
+    // Calculate from your existing user data
+    // Replace this with your actual damage calculation logic
+    let totalDps = 0;
+    const players = [];
+    
+    // Example - you'll need to adapt this to your actual data structure:
+    // for (const [uid, userData] of Object.entries(userDataManager.users)) {
+    //     const dps = calculatePlayerDPS(userData);
+    //     totalDps += dps;
+    //     players.push({
+    //         name: userData.name || `Player_${uid}`,
+    //         dps: dps,
+    //         percentage: 0 // Calculate percentage
+    //     });
+    // }
+    
+    // Sort players by DPS
+    players.sort((a, b) => b.dps - a.dps);
+    
+    // Calculate percentages
+    players.forEach(player => {
+        player.percentage = totalDps > 0 ? Math.round((player.dps / totalDps) * 100) : 0;
+    });
+    
+    damageData.totalDps = totalDps;
+    damageData.playerCount = players.length;
+    damageData.players = players.slice(0, 10); // Top 10 players
+    
+    res.json(damageData);
+});

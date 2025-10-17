@@ -1,0 +1,34 @@
+/* Add this CSS file and include it in your existing webpage for better overlay appearance */
+
+body.overlay-mode {
+    background: rgba(0, 20, 40, 0.9) !important;
+    font-family: 'Consolas', 'Monaco', monospace !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    border-radius: 10px !important;
+    border: 2px solid rgba(0, 150, 255, 0.7) !important;
+}
+
+.overlay-mode * {
+    color: white !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+.overlay-mode table {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(0, 150, 255, 0.3) !important;
+}
+
+.overlay-mode th {
+    background: rgba(0, 100, 200, 0.8) !important;
+    color: white !important;
+}
+
+.overlay-mode tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.overlay-mode tr:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
