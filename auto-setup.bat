@@ -2,15 +2,6 @@
 setlocal enabledelayedexpansion
 color 0E
 title Star Resonance Damage Counter - Auto Setup
-
-echo ===============================================
-echo  Star Resonance Damage Counter
-echo  AUTOMATIC SETUP (ADVANCED)
-echo ===============================================
-echo.
-
-echo This script will automatically install EVERYTHING needed:
-echo  - Chocolatey (Windows package manager)
 echo  - Node.js (via Chocolatey)
 echo  - Project dependencies
 echo  - Npcap for network capture
@@ -55,12 +46,12 @@ if %errorLevel% neq 0 (
     call refreshenv.cmd >nul 2>&1
     
     echo [✓] Chocolatey installed!
+set CHOCO_PATH=%ProgramData%\chocolatey\bin\choco.exe
+if exist "%CHOCO_PATH%" (
+    set CHOCO=%CHOCO_PATH%
 ) else (
-    echo [✓] Chocolatey already installed
+    set CHOCO=choco
 )
-
-echo.
-echo ===============================================
 echo  STEP 2: NODE.JS INSTALLATION
 echo ===============================================
 echo.
